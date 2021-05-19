@@ -17,7 +17,7 @@ class PySats:
         else:
             import jnius_config
             jnius_config.set_classpath(
-                '.', os.path.join('./exp/datasets/PySats/libnew', '*'))
+                '.', os.path.join('./exp/datasets/PySats/lib', '*'))
             PySats.__instance = self
 
 
