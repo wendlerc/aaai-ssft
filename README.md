@@ -16,6 +16,10 @@ The auction simulation test suite requrires pyjnius, which requires Cython.
 ```bash
 pip install cython
 ```
+
+Furthermore, download sats-v0.6.4.jar from https://github.com/spectrumauctions/sats/releases/tag/v0.6.4
+and place it in ./exp/datasets/PySats/lib.
+
 Now, you can install the remaining requirements.
 ```bash
 pip install -r requirements.txt
