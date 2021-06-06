@@ -4,6 +4,22 @@
 
 Many applications of machine learning on discrete domains, such as learning preference functions in recommender systems or auctions, can be reduced to estimating a set function that is sparse in the Fourier domain. In this work, we present a new family of algorithms for learning Fourier-sparse set functions. They require at most nk - k log(k) + k queries (set function evaluations), under mild conditions on the Fourier coefficients, where is the size of the ground set and the number of non-zero Fourier coefficients. In contrast to other work that focused on the orthogonal Walsh-Hadamard transform, our novel algorithms operate with recently introduced non-orthogonal Fourier transforms that offer different notions of Fourier-sparsity. These naturally arise when modeling, e.g., sets of items forming substitutes and complements. We demonstrate effectiveness on several real-world applications.
 
+## Bibtex
+
+```bibtex
+@article{Wendler_Amrollahi_Seifert_Krause_Püschel_2021, 
+title={Learning Set Functions that are Sparse in Non-Orthogonal {F}ourier Bases}, 
+volume={35}, 
+url={https://ojs.aaai.org/index.php/AAAI/article/view/17232}, 
+number={12}, 
+journal={Proceedings of the AAAI Conference on Artificial Intelligence}, 
+author={Wendler, Chris and Amrollahi, Andisheh and Seifert, Bastian and Krause, Andreas and P{\"u}schel, Markus}, 
+year={2021}, 
+month={May}, 
+pages={10283-10292}
+}
+```
+
 # Implementation
 
 We provide a sample implementation of our novel algorithms SSFT and SSFT+.
