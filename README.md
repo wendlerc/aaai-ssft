@@ -28,7 +28,7 @@ We provide a sample implementation of our novel algorithms SSFT and SSFT+.
 
 Make sure you have at least Python 3.6. We ran everything on Python 3.8.
 
-The auction simulation test suite requrires pyjnius, which requires Cython.
+The auction simulation test suite requires pyjnius, which requires Cython.
 ```bash
 pip install cython
 ```
