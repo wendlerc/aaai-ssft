@@ -49,6 +49,40 @@ class WrapSetFunction(SetFunction):
             if count_flag:
                 self.call_counter += indicator.shape[0]
             return self.s(indicator)
+        
+
+class WrapVector(SetFunction):
+    def __init__(self, s_vec):
+        self.s_vec = s_vec
+        self.call_counter = 0
+        self.n = int(np.log2(len(self.s_vec)))
+        self.singletons = 2**np.arange(self.n)
+        
+    def  __call__(self, indicator, count_flag=True):
+        if len(indicator.shape) < 2:
+            indicator = indicator[np.newaxis, :]
+        
+        indicator = indicator.astype(bool)
+        
+        result = []
+        if count_flag:
+            self.call_counter += indicator.shape[0]
+        
+        return np.asarray([self.s_vec[self.singletons[ind].sum()] for ind in indicator])
+    
+
+class ReverseSetFunction(SetFunction):
+    def __init__(self, s):
+        self.s = s
+        self.call_counter = 0
+        
+    def __call__(self, indicator, count_flag=True):
+        if len(indicator.shape) < 2:
+            indicator = indicator[np.newaxis, :]
+        return self.s(1 - indicator)
+        
+
+        
 
 
 class SparseDSFT4Function(SetFunction):
@@ -129,6 +163,82 @@ class DSFT4OneHop(SetFunction):
         for key, value in zip(freqs, coefs):
             coefs_new += [value/(1 + self.weights[True^key].sum())]
         return SparseDSFT4Function(freqs.astype(np.int32), np.asarray(coefs_new))
+    
+
+
+class SparseDSFT3Function(SetFunction):
+    
+    def __init__(self, frequencies, coefficients):
+        """
+            @param frequencies: two dimensional np.array of type np.int32 or np.bool 
+            with one indicator vector per row
+            @param coefficients: one dimensional np.array of corresponding Fourier 
+            coeffients
+        """
+        self.freqs = frequencies
+        self.coefs = coefficients
+        self.call_counter = 0
+        
+        
+    def __call__(self, indicators, count_flag=True):
+        """
+            @param indicators: two dimensional np.array of type np.int32 or np.bool
+            with one indicator vector per row
+            @param count_flag: a flag indicating whether to count set function evaluations
+            @returns: a np.array of set function evaluations
+        """
+        ind = indicators
+        freqs = self.freqs
+        coefs = self.coefs
+        if len(ind.shape) < 2:
+            ind = ind[np.newaxis, :]
+        active = freqs.dot((1 - ind).T)
+
+        active = active == 0
+        res = (active * coefs[:, np.newaxis]).sum(axis=0)
+
+        return res
+    
+    
+    
+class DSFT3OneHop(SetFunction):
+    
+    def __init__(self, n, weights, set_function):
+        self.n = n
+        self.weights = weights
+        self.s = set_function
+        self.call_counter = 0
+    
+    def __call__(self, indicators, count_flag=True ):
+        if len(indicators.shape) < 2:
+            indicators = indicators[np.newaxis, :]
+        
+        s = self.s
+        weights = self.weights
+        res = []
+        for ind in indicators:
+            nc = np.sum(ind)
+            if count_flag:
+                self.call_counter += (nc + 1)
+            mask = ind.astype(np.int32)==1
+            ind_shifted = np.tile(ind, [nc, 1])
+            ind_shifted[:, mask] = 1-np.eye(nc, dtype=ind.dtype)
+            ind_one_hop = np.concatenate((ind[np.newaxis], ind_shifted), axis=0)
+            weight_s0 = np.ones(1)*(1 + weights[True^mask].sum())
+            active_weights = np.concatenate([weight_s0, weights[mask]])
+            res += [(s(ind_one_hop)*active_weights).sum()]
+        res = np.asarray(res)
+        return res
+    
+    def convertCoefs(self, estimate):
+        freqs = estimate.freqs
+        coefs = estimate.coefs
+        coefs_new = []
+        freqs = freqs.astype(np.bool)
+        for key, value in zip(freqs, coefs):
+            coefs_new += [value/(1 + self.weights[True^key].sum())]
+        return SparseDSFT3Function(freqs.astype(np.int32), np.asarray(coefs_new))
+    
 
 
 def eval_sf(gt, estimate, n, n_samples=1000, err_type="rel", custom_samples=None, p=0.5):

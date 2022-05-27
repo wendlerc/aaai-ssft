@@ -1,7 +1,7 @@
 import inspect
 
 from sacred import Ingredient
-from sdsft import SparseSFT
+from sdsft import SparseSFT, SparseSFT3
 
 ingredient = Ingredient('model')
 
@@ -29,6 +29,29 @@ def SSFT():
 def SSFTPlus():
     name = 'Sparse set function Fourier transform plus filtering'
     constructor = SparseSFT
+    parameters = {
+        'eps':1e-3,
+        'flag_print':False,
+        'k_max':1000,
+        'flag_general':True,
+    }
+    
+    
+@ingredient.named_config
+def SSFT3():
+    name = 'Sparse set function Fourier transform'
+    constructor = SparseSFT3
+    parameters = {
+        'eps':1e-3,
+        'flag_print':False,
+        'k_max':1000,
+        'flag_general':False,
+    }
+
+@ingredient.named_config
+def SSFT3Plus():
+    name = 'Sparse set function Fourier transform plus filtering'
+    constructor = SparseSFT3
     parameters = {
         'eps':1e-3,
         'flag_print':False,
